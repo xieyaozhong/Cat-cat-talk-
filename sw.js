@@ -1,8 +1,8 @@
-const CACHE='cat-cat-talk-v2-1';
+const CACHE='cat-cat-talk-v2-2';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
 
 self.addEventListener('message',event=>{
@@ -19,10 +19,9 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET') return;
-
   if(event.request.mode==='navigate'){
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request,{cache:'no-store'})
         .then(response=>{
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put('./index.html',copy));
@@ -32,17 +31,12 @@ self.addEventListener('fetch',event=>{
     );
     return;
   }
-
   event.respondWith(
-    caches.match(event.request).then(cached=>{
-      const network=fetch(event.request).then(response=>{
-        if(response && response.ok){
-          const copy=response.clone();
-          caches.open(CACHE).then(cache=>cache.put(event.request,copy));
-        }
+    fetch(event.request)
+      .then(response=>{
+        if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
         return response;
-      }).catch(()=>cached);
-      return cached || network;
-    })
+      })
+      .catch(()=>caches.match(event.request))
   );
 });
