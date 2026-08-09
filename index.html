@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#17151f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="貓咪對話器" />
+  <title>貓咪對話器 Cat Cat Talk</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <style>
+    :root{
+      --bg:#100f16; --bg2:#1a1722; --card:rgba(255,255,255,.075); --line:rgba(255,255,255,.11);
+      --text:#fffaf2; --muted:#b9b1c5; --accent:#ffbf69; --accent2:#ff7e8f; --good:#8de5ba;
+      --shadow:0 20px 60px rgba(0,0,0,.34); --r:26px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{background:var(--bg)}
+    body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Noto Sans TC","PingFang TC",system-ui,sans-serif;color:var(--text);background:
+      radial-gradient(circle at 15% 8%,rgba(255,126,143,.18),transparent 32%),
+      radial-gradient(circle at 90% 14%,rgba(255,191,105,.16),transparent 30%),
+      linear-gradient(155deg,var(--bg),var(--bg2) 60%,#0d1017);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(760px,100%);margin:auto;padding:22px 16px 42px}
+    .hero{padding:18px 4px 14px;display:flex;align-items:center;gap:16px}
+    .cat-head{width:74px;height:74px;flex:0 0 74px;border-radius:24px;background:linear-gradient(145deg,#ffc976,#ff8f82);display:grid;place-items:center;box-shadow:0 15px 38px rgba(255,139,126,.22);font-size:40px;transform:rotate(-3deg)}
+    h1{font-size:clamp(28px,6vw,42px);letter-spacing:-.04em;margin:0 0 5px}.sub{color:var(--muted);margin:0;line-height:1.55;font-size:14px}
+    .status{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}.pill{font-size:12px;color:#e7dfed;border:1px solid var(--line);background:rgba(255,255,255,.05);padding:7px 10px;border-radius:999px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:18px;position:sticky;top:max(8px,env(safe-area-inset-top));z-index:20;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .tab{border:0;background:transparent;color:var(--muted);border-radius:13px;padding:12px 8px;font-weight:700;font-size:13px}.tab.active{background:linear-gradient(145deg,rgba(255,191,105,.98),rgba(255,126,143,.95));color:#27181d;box-shadow:0 8px 24px rgba(255,126,143,.18)}
+    .panel{display:none}.panel.active{display:block;animation:in .28s ease both}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .card{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .card h2{margin:0 0 6px;font-size:20px}.hint{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 14px}
+    textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);border-radius:18px;background:rgba(7,7,12,.38);color:var(--text);padding:15px;outline:none;line-height:1.6}textarea:focus,select:focus{border-color:rgba(255,191,105,.55);box-shadow:0 0 0 3px rgba(255,191,105,.09)}
+    .quick{display:flex;gap:8px;overflow:auto;padding:10px 0 2px;scrollbar-width:none}.quick::-webkit-scrollbar{display:none}.chip{white-space:nowrap;border:1px solid var(--line);background:rgba(255,255,255,.055);color:#eee7f2;padding:9px 12px;border-radius:999px;font-size:13px}
+    .mainbtn{width:100%;border:0;margin-top:14px;padding:15px 16px;border-radius:17px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#29181c;font-weight:900;letter-spacing:.02em;box-shadow:0 10px 28px rgba(255,126,143,.20)}.mainbtn:active{transform:scale(.985)}
+    .secondary{width:100%;border:1px solid var(--line);margin-top:10px;padding:13px 16px;border-radius:17px;background:rgba(255,255,255,.06);color:var(--text);font-weight:750}
+    .bubble{display:none;margin-top:16px;padding:17px;border-radius:20px;background:rgba(255,255,255,.065);border:1px solid var(--line)}.bubble.show{display:block}.bubble .big{font-size:28px;font-weight:900;letter-spacing:.03em}.bubble p{margin:6px 0 0;color:#ddd5e3;line-height:1.55;font-size:14px}.action{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--good);line-height:1.55}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin:0 0 7px 4px}.field select{width:100%;appearance:none;border:1px solid var(--line);border-radius:15px;background:#1a1821;color:var(--text);padding:13px 38px 13px 13px;outline:none;background-image:linear-gradient(45deg,transparent 50%,#c7becf 50%),linear-gradient(135deg,#c7becf 50%,transparent 50%);background-position:calc(100% - 17px) 18px,calc(100% - 12px) 18px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+    .mood{display:flex;align-items:center;gap:13px}.moodEmoji{font-size:42px}.bar{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:9px}.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width .45s ease}
+    .micOrb{width:118px;height:118px;margin:22px auto 12px;border-radius:50%;display:grid;place-items:center;font-size:42px;border:1px solid rgba(255,255,255,.14);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),rgba(255,126,143,.12) 45%,rgba(255,191,105,.08));box-shadow:0 0 0 0 rgba(255,126,143,.24);transition:.2s}.micOrb.listening{animation:pulse 1.2s infinite}@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(255,126,143,0);transform:scale(1.04)}}
+    .meter{height:34px;display:flex;align-items:end;gap:4px;justify-content:center;margin:12px 0}.meter i{display:block;width:5px;min-height:4px;background:linear-gradient(var(--accent2),var(--accent));border-radius:10px;transition:height .08s}
+    .privacy{font-size:12px;color:var(--muted);text-align:center;line-height:1.45}.privacy b{color:#e8e1eb}
+    .log{display:grid;gap:8px;margin-top:10px}.logItem{padding:12px 13px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.04);font-size:13px;line-height:1.5}.logItem small{display:block;color:var(--muted);margin-top:3px}
+    .footer{margin:18px 6px 0;color:#8e8798;font-size:11px;line-height:1.55;text-align:center}
+    .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#f8f2ea;color:#211b22;padding:10px 14px;border-radius:999px;font-weight:700;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 30px #0007}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:480px){.wrap{padding-inline:13px}.hero{gap:12px}.cat-head{width:62px;height:62px;flex-basis:62px;font-size:34px;border-radius:20px}.card{padding:16px;border-radius:23px}.grid{grid-template-columns:1fr}.tabs .tab{font-size:12px;padding-inline:4px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <div class="cat-head" aria-hidden="true">🐈</div>
+      <div><h1>貓咪對話器</h1><p class="sub">把你的意思變成貓咪比較容易理解的互動提示，也從叫聲與肢體線索猜猜牠現在想表達什麼。</p></div>
+    </header>
+    <div class="status"><span class="pill">🔊 合成貓語</span><span class="pill">🎙️ 裝置端聲音分析</span><span class="pill">📱 可加入主畫面</span></div>
+
+    <nav class="tabs" aria-label="功能切換">
+      <button class="tab active" data-tab="human">人 → 貓</button>
+      <button class="tab" data-tab="cat">貓 → 人</button>
+      <button class="tab" data-tab="listen">聽貓叫</button>
+    </nav>
+
+    <section class="panel active" id="human">
+      <div class="card">
+        <h2>你想跟牠說什麼？</h2>
+        <p class="hint">輸入一句話，我會挑一組較合適的聲音節奏與互動方式。貓通常更依賴語氣、動作、氣味與習慣，而不是像人類一樣理解句子。</p>
+        <textarea id="humanText" maxlength="160" placeholder="例如：過來吃飯囉、我想抱抱你、不要咬電線、晚安～"></textarea>
+        <div class="quick">
+          <button class="chip" data-phrase="過來吃飯囉">🍗 吃飯</button><button class="chip" data-phrase="過來，我想摸摸你">🤍 過來</button><button class="chip" data-phrase="一起玩逗貓棒">🧶 玩耍</button><button class="chip" data-phrase="不要咬這個">🛑 不可以</button><button class="chip" data-phrase="晚安，安心睡覺吧">🌙 晚安</button>
+        </div>
+        <button class="mainbtn" id="translateBtn">翻成貓咪比較懂的方式</button>
+        <div class="bubble" id="humanResult"><div class="big" id="catLine">喵～</div><p id="catMeaning"></p><div class="action" id="catAction"></div><button class="secondary" id="playAgain">🔊 再播放一次</button></div>
+      </div>
+    </section>
+
+    <section class="panel" id="cat">
+      <div class="card">
+        <h2>牠現在是什麼樣子？</h2>
+        <p class="hint">把叫聲與身體語言一起看，會比只聽一聲「喵」更有參考價值。</p>
+        <div class="grid">
+          <div class="field"><label for="soundType">叫聲</label><select id="soundType"><option value="short">短促「喵」一聲</option><option value="repeat">連續一直喵</option><option value="long">拉長的「喵——」</option><option value="high">尖、高音</option><option value="low">低沉／嗚聲</option><option value="purr">呼嚕聲</option><option value="hiss">哈氣／嘶聲</option></select></div>
+          <div class="field"><label for="tailType">尾巴</label><select id="tailType"><option value="up">直直豎起</option><option value="curve">尾端彎彎</option><option value="flick">快速甩動</option><option value="puff">炸毛</option><option value="low">低垂／夾著</option><option value="wrap">輕鬆環繞身體</option></select></div>
+          <div class="field"><label for="earType">耳朵</label><select id="earType"><option value="forward">朝前／自然</option><option value="side">向兩側</option><option value="back">往後壓</option><option value="move">一直轉動</option></select></div>
+          <div class="field"><label for="distanceType">牠與你的距離</label><select id="distanceType"><option value="near">主動靠近</option><option value="follow">跟著你走</option><option value="stay">待在原地看你</option><option value="hide">躲起來／退後</option></select></div>
+        </div>
+        <button class="mainbtn" id="readCatBtn">幫我推測牠的心情</button>
+        <div class="bubble" id="catResult"><div class="mood"><div class="moodEmoji" id="moodEmoji">😺</div><div><div class="big" id="moodTitle">可能是在打招呼</div><p id="moodText"></p></div></div><div class="bar"><i id="confidenceBar"></i></div><div class="action" id="moodAction"></div></div>
+      </div>
+      <div class="card"><h2>最近的互動</h2><p class="hint">只存在這台裝置的瀏覽器裡。</p><div class="log" id="log"><div class="logItem">還沒有紀錄。先和貓咪聊一句吧 🐾</div></div><button class="secondary" id="clearLog">清除紀錄</button></div>
+    </section>
+
+    <section class="panel" id="listen">
+      <div class="card">
+        <h2>聽 3 秒鐘的貓叫</h2>
+        <p class="hint">用麥克風讀取音量與頻率分布，做一個快速的「聲音特徵小測」。結果不是醫療或動物行為診斷。</p>
+        <div class="micOrb" id="micOrb">🎙️</div>
+        <div class="meter" id="meter"></div>
+        <button class="mainbtn" id="listenBtn">開始聽</button>
+        <p class="privacy"><b>隱私：</b>聲音只在你的裝置上即時分析，不會上傳到伺服器。</p>
+        <div class="bubble" id="listenResult"><div class="big" id="listenTitle">聲音特徵結果</div><p id="listenText"></p><div class="action" id="listenAction"></div></div>
+      </div>
+      <div class="card"><h2>🐾 小提醒</h2><p class="hint" style="margin:0">如果貓咪突然持續哀叫、呼吸異常、躲藏、食慾明顯下降、頻繁進出貓砂盆卻排不出尿，或行為和平常差很多，請優先觀察身體狀況並諮詢獸醫，不要只靠這個頁面的推測。</p></div>
+    </section>
+
+    <p class="footer">Cat Cat Talk · 趣味互動工具。貓咪的叫聲沒有一套能逐字翻譯成人類語言的通用字典；本工具以常見聲音與肢體線索做情境化提示。</p>
+  </main>
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const toast = msg => { const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),1800); };
+
+$$('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.tab').forEach(x=>x.classList.toggle('active',x===btn));
+  $$('.panel').forEach(x=>x.classList.toggle('active',x.id===btn.dataset.tab));
+}));
+$$('.chip').forEach(btn=>btn.addEventListener('click',()=>{ $('#humanText').value=btn.dataset.phrase; $('#humanText').focus(); }));
+
+let audioCtx;
+function context(){ audioCtx ||= new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function meow({base=520,duration=.62,start=1.1,end=.78,wobble=28,soft=false}={}){
+  const ctx=context(); if(ctx.state==='suspended') ctx.resume(); const now=ctx.currentTime;
+  const master=ctx.createGain(); master.gain.setValueAtTime(.0001,now); master.gain.exponentialRampToValueAtTime(soft?.13:.22,now+.045); master.gain.exponentialRampToValueAtTime(.0001,now+duration); master.connect(ctx.destination);
+  [1,1.52].forEach((mul,i)=>{ const osc=ctx.createOscillator(),g=ctx.createGain(); osc.type=i?'sine':'triangle'; g.gain.value=i?.22:.78; osc.frequency.setValueAtTime(base*start*mul,now); osc.frequency.exponentialRampToValueAtTime(base*1.22*mul,now+duration*.32); osc.frequency.exponentialRampToValueAtTime(base*end*mul,now+duration); osc.detune.setValueAtTime(-wobble,now); osc.detune.linearRampToValueAtTime(wobble,now+duration*.45); osc.detune.linearRampToValueAtTime(-wobble*.6,now+duration); osc.connect(g).connect(master); osc.start(now); osc.stop(now+duration+.03); });
+}
+function purr(){ const ctx=context(); const now=ctx.currentTime, len=1.5; const osc=ctx.createOscillator(), gain=ctx.createGain(), lfo=ctx.createOscillator(), lg=ctx.createGain(); osc.type='sine'; osc.frequency.value=58; lfo.frequency.value=25; lg.gain.value=.07; gain.gain.value=.10; lfo.connect(lg).connect(gain.gain); osc.connect(gain).connect(ctx.destination); osc.start(now); lfo.start(now); gain.gain.setValueAtTime(.001,now); gain.gain.linearRampToValueAtTime(.11,now+.15); gain.gain.linearRampToValueAtTime(.001,now+len); osc.stop(now+len);lfo.stop(now+len); }
+function sequence(kind){
+  if(kind==='food'){ meow({base:610,duration:.43,start:1,end:.9}); setTimeout(()=>meow({base:690,duration:.34,start:1.08,end:.86}),470); }
+  else if(kind==='come'){ meow({base:520,duration:.58,start:1,end:.72,soft:true}); }
+  else if(kind==='play'){ meow({base:720,duration:.30,start:.86,end:1.15}); setTimeout(()=>meow({base:760,duration:.27,start:.9,end:1.1}),350); }
+  else if(kind==='stop'){ meow({base:390,duration:.42,start:1.1,end:.68}); }
+  else if(kind==='sleep'){ meow({base:430,duration:.75,start:1,end:.66,soft:true}); setTimeout(purr,760); }
+  else { meow({base:540,duration:.58,start:1,end:.78,soft:true}); }
+}
+const humanMap=[
+  {re:/吃|飯|罐|零食|餓/,kind:'food',line:'喵！喵～',meaning:'情境：吃飯／零食時間。用固定、輕快的短句和固定動作，比模仿貓叫更容易建立連結。',action:'建議：叫名字 → 拿碗或指向固定位置 → 等牠靠近後再放飯。'},
+  {re:/過來|來這|摸|抱|親/,kind:'come',line:'喵～',meaning:'情境：邀請靠近。對多數貓而言，「給選擇」會比直接抓過來更舒服。',action:'建議：蹲低、側身、慢慢眨眼，伸一根手指讓牠主動靠近聞。'},
+  {re:/玩|逗貓|球|追|跑/,kind:'play',line:'咪！喵！',meaning:'情境：玩耍邀請。短促、稍高的聲音搭配移動中的玩具，訊息會更清楚。',action:'建議：玩具模仿獵物「躲—停—跑」，最後讓牠成功抓到一次。'},
+  {re:/不行|不要|不可以|咬|抓|停/,kind:'stop',line:'嗯—喵。',meaning:'情境：希望停止某個行為。大聲吼叫常只會造成驚嚇，不一定能讓牠理解規則。',action:'建議：平穩短聲制止 → 立刻阻隔目標 → 提供可以咬／抓的替代物。'},
+  {re:/睡|晚安|休息|乖乖/,kind:'sleep',line:'喵嗚……rrrr',meaning:'情境：準備休息。低刺激、固定流程通常比任何「貓語」更有效。',action:'建議：降低燈光與音量，固定睡前摸摸或小點心儀式。'}
+];
+let lastKind='come';
+$('#translateBtn').addEventListener('click',()=>{
+  const text=$('#humanText').value.trim(); if(!text){toast('先輸入一句想對牠說的話 🐾');return;}
+  const hit=humanMap.find(x=>x.re.test(text)) || {kind:'come',line:'喵～',meaning:'我把它當成一般的友善互動：柔和、短句、可預測的動作，通常比較容易讓貓咪安心。',action:'建議：先叫名字，再用慢眨眼或手勢搭配你的話，觀察牠是否願意回應。'};
+  lastKind=hit.kind; $('#catLine').textContent=hit.line; $('#catMeaning').textContent=hit.meaning; $('#catAction').textContent=hit.action; $('#humanResult').classList.add('show'); sequence(hit.kind); addLog('你 → 貓',text+'｜'+hit.line); }
+);
+$('#playAgain').addEventListener('click',()=>sequence(lastKind));
+
+function interpretCat(){
+ const s=$('#soundType').value,t=$('#tailType').value,e=$('#earType').value,d=$('#distanceType').value;
+ let friendly=0,stress=0,demand=0;
+ if(['short','purr'].includes(s))friendly+=2;if(s==='repeat')demand+=2;if(['high','long'].includes(s)){demand++;stress++}if(['low','hiss'].includes(s))stress+=3;
+ if(['up','curve','wrap'].includes(t))friendly+=2;if(t==='flick')stress+=2;if(['puff','low'].includes(t))stress+=3;
+ if(e==='forward')friendly+=2;if(e==='move')demand++;if(e==='side')stress++;if(e==='back')stress+=3;
+ if(['near','follow'].includes(d))friendly+=2;if(d==='follow')demand+=2;if(d==='hide')stress+=3;
+ let title,emoji,text,action,conf;
+ if(stress>=6){ title='可能正在緊張或警戒';emoji='🙀';text='哈氣、耳朵後壓、炸毛、退後等線索如果同時出現，通常比單一叫聲更值得重視。';action='先停止逼近，不要伸手硬摸；留出退路與安靜空間。若狀況突然出現或持續很久，留意是否有疼痛或不適。';conf=Math.min(92,58+stress*4); }
+ else if(demand>=4 && friendly>=2){ title='可能在要求你注意牠';emoji='😼';text='連續叫、跟著你走，又願意靠近，常見於想吃飯、想玩、想開門或單純想找你互動。';action='先檢查水、食物、貓砂與日常時間點，再用玩具或摸摸測試牠真正想要什麼。';conf=Math.min(88,55+demand*5); }
+ else if(friendly>=6){ title='看起來偏友善、放鬆';emoji='😺';text='尾巴豎起、耳朵自然、主動靠近等組合，通常是很好的社交訊號。';action='可以慢眨眼回應，讓牠自己決定靠多近。若正在呼嚕，也要同時看身體是否放鬆，因為緊張或疼痛時也可能呼嚕。';conf=Math.min(90,56+friendly*4); }
+ else { title='訊號有點混合';emoji='🐱';text='目前的線索沒有明顯指向單一情緒。貓咪的個體差異很大，同一種叫聲在不同情境可能代表不同事情。';action='把「前後發生什麼、牠往哪裡走、吃喝與貓砂狀況」一起觀察，通常最有用。';conf=54; }
+ $('#moodEmoji').textContent=emoji;$('#moodTitle').textContent=title;$('#moodText').textContent=text;$('#moodAction').textContent=action;$('#confidenceBar').style.width=conf+'%';$('#catResult').classList.add('show'); addLog('貓 → 人',title); }
+$('#readCatBtn').addEventListener('click',interpretCat);
+
+function addLog(type,msg){ const items=JSON.parse(localStorage.getItem('catTalkLog')||'[]'); items.unshift({type,msg,time:new Date().toLocaleString('zh-TW',{hour:'2-digit',minute:'2-digit',month:'numeric',day:'numeric'})}); localStorage.setItem('catTalkLog',JSON.stringify(items.slice(0,8))); renderLog(); }
+function renderLog(){ const box=$('#log'),items=JSON.parse(localStorage.getItem('catTalkLog')||'[]'); box.innerHTML=items.length?items.map(x=>`<div class="logItem"><b>${esc(x.type)}</b>　${esc(x.msg)}<small>${esc(x.time)}</small></div>`).join(''):'<div class="logItem">還沒有紀錄。先和貓咪聊一句吧 🐾</div>'; }
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+$('#clearLog').addEventListener('click',()=>{localStorage.removeItem('catTalkLog');renderLog();toast('紀錄已清除');}); renderLog();
+
+const meter=$('#meter'); for(let i=0;i<24;i++)meter.appendChild(document.createElement('i'));
+let listening=false;
+$('#listenBtn').addEventListener('click',async()=>{
+ if(listening)return; if(!navigator.mediaDevices?.getUserMedia){toast('這個瀏覽器不支援麥克風分析');return;}
+ try{
+   listening=true; $('#listenBtn').textContent='正在聽…'; $('#micOrb').classList.add('listening'); $('#listenResult').classList.remove('show');
+   const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); const ctx=context(); const src=ctx.createMediaStreamSource(stream),an=ctx.createAnalyser(); an.fftSize=2048; src.connect(an); const td=new Uint8Array(an.fftSize), fd=new Uint8Array(an.frequencyBinCount); let rmsSum=0,centSum=0,n=0,peak=0,start=performance.now();
+   await new Promise(resolve=>{ function tick(){ an.getByteTimeDomainData(td);an.getByteFrequencyData(fd);let sq=0;for(const v of td){const x=(v-128)/128;sq+=x*x}const rms=Math.sqrt(sq/td.length);peak=Math.max(peak,rms);let mag=0,weighted=0;for(let i=1;i<fd.length;i++){const m=fd[i];mag+=m;weighted+=m*i}const centroid=mag?weighted/mag*ctx.sampleRate/an.fftSize:0;rmsSum+=rms;centSum+=centroid;n++; const h=Math.max(4,Math.min(32,rms*210)); $$('#meter i').forEach((b,i)=>b.style.height=Math.max(4,h*(.45+Math.abs(Math.sin(i*.68+performance.now()/160))*.55))+'px'); if(performance.now()-start<3000)requestAnimationFrame(tick);else resolve();} tick(); });
+   stream.getTracks().forEach(t=>t.stop()); const rms=rmsSum/n,cent=centSum/n; let title,text,action;
+   if(peak<.025){title='幾乎沒有捕捉到明顯叫聲';text='環境可能太安靜，或手機離貓咪太遠。';action='可以靠近一點再試，但不要為了測試刻意逼貓咪叫。';}
+   else if(rms>.13 && cent>1800){title='偏響亮、偏高頻';text='這段聲音的能量和高頻成分都比較明顯，可能是比較急迫或興奮的叫聲。';action='搭配耳朵、尾巴、距離與當下情境一起判斷；若同時有緊張肢體訊號，先給牠空間。';}
+   else if(rms>.10){title='偏響亮、有存在感';text='這段聲音音量較明顯，常適合進一步觀察牠是不是在要求食物、開門或注意力。';action='看看牠叫完後往哪裡走，通常比單看音高更能提供線索。';}
+   else if(cent>1700){title='較輕、偏高頻';text='聲音較輕，但高頻比例較多。可能是短促招呼、期待或較細的叫聲。';action='如果牠主動靠近、尾巴豎起，整體通常更偏社交與友善。';}
+   else {title='較柔和、偏低頻';text='這段聲音整體較輕、頻率重心較低。單靠聲音還無法判斷是放鬆、低鳴或背景聲。';action='再觀察身體是否放鬆、耳朵位置，以及聲音是否持續反覆出現。';}
+   $('#listenTitle').textContent=title;$('#listenText').textContent=`平均強度 ${Math.round(rms*1000)/10}% · 頻率重心約 ${Math.round(cent)} Hz。${text}`;$('#listenAction').textContent=action;$('#listenResult').classList.add('show');addLog('聲音小測',title);
+ }catch(err){toast(err.name==='NotAllowedError'?'需要允許麥克風權限才能使用':'無法啟動麥克風');}
+ finally{listening=false;$('#listenBtn').textContent='開始聽';$('#micOrb').classList.remove('listening');$$('#meter i').forEach(b=>b.style.height='4px');}
+});
+
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
