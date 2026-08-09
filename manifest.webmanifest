@@ -1,0 +1,19 @@
+{
+  "name": "貓咪對話器 Cat Cat Talk",
+  "short_name": "貓咪對話器",
+  "description": "趣味的人貓互動與聲音特徵小工具",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#100f16",
+  "theme_color": "#17151f",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
